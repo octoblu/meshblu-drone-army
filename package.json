@@ -1,10 +1,13 @@
 {
   "name": "meshblu-drone-army",
   "version": "1.0.0",
+  "description": "Drone Army Arise!",
   "scripts": {
     "start": "node command.js"
   },
   "dependencies": {
+    "ar-drone": "^0.3.3",
+    "coffee-script": "^1.8.0",
     "skynet": "^1.1.1"
   },
   "keywords": [
