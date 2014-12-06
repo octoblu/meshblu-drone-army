@@ -1,17 +1,16 @@
 'use strict';
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
+var arDrone = require('ar-drone');
+var debug = require('debug')('meshblu-drone-army');
 
 var MESSAGE_SCHEMA = {
   type: 'object',
   properties: {
-    exampleBoolean: {
-      type: 'boolean',
-      required: true
-    },
-    exampleString: {
+    action: {
       type: 'string',
-      required: true
+      required: true,
+      enum: ["takeoff", "land", "reset", "disableEmergency"]
     }
   }
 };
@@ -19,32 +18,34 @@ var MESSAGE_SCHEMA = {
 var OPTIONS_SCHEMA = {
   type: 'object',
   properties: {
-    firstExampleOption: {
+    ip: {
       type: 'string',
-      required: true
+      required: false
     }
   }
 };
 
 function Plugin(){
-  this.options = {};
-  this.messageSchema = MESSAGE_SCHEMA;
-  this.optionsSchema = OPTIONS_SCHEMA;
+  var self = this;
+  self.options = {};
+  self.messageSchema = MESSAGE_SCHEMA;
+  self.optionsSchema = OPTIONS_SCHEMA;
   return this;
 }
 util.inherits(Plugin, EventEmitter);
 
 Plugin.prototype.onMessage = function(message){
-  var payload = message.payload;
-  this.emit('message', {devices: ['*'], topic: 'echo', payload: payload});
+  debug('message.payload.action', message.payload.action);
+  this.client[message.payload.action]();
 };
 
 Plugin.prototype.onConfig = function(device){
-  self.setOptions(device.options||{});
+  this.setOptions(device.options||{});
 };
 
 Plugin.prototype.setOptions = function(options){
   this.options = options;
+  this.client = arDrone.createClient(this.options);
 };
 
 module.exports = {
