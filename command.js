@@ -1,6 +1,7 @@
 'use strict';
-var Plugin = require('./index').Plugin;
 var skynet = require('skynet');
+var debug  = require('debug')('meshblu-drone-army:command');
+var Plugin = require('./index').Plugin;
 var config = require('./meshblu.json');
 
 var conx = skynet.createConnection({
@@ -10,12 +11,19 @@ var conx = skynet.createConnection({
   token  : config.token
 });
 
-conx.on('notReady', console.error);
-conx.on('error', console.error);
+conx.on('notReady', function(){
+  debug('notReady');
+  console.error.apply(this, arguments);
+});
+conx.on('error', function(){
+  debug('error');
+  console.error.apply(this, arguments);
+});
 
 var plugin = new Plugin();
 
 conx.on('ready', function(){
+  debug('ready');
   conx.whoami({uuid: config.uuid}, function(device){
     plugin.setOptions(device.options || {});
     conx.update({
