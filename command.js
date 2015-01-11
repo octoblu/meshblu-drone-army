@@ -1,10 +1,10 @@
 'use strict';
-var skynet = require('skynet');
+var meshblu = require('meshblu');
 var debug  = require('debug')('meshblu-drone-army:command');
 var Plugin = require('./index').Plugin;
 var config = require('./meshblu.json');
 
-var conx = skynet.createConnection({
+var conx = meshblu.createConnection({
   server : config.server,
   port   : config.port,
   uuid   : config.uuid,
