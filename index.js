@@ -48,6 +48,7 @@ function Plugin(){
   self.options = {};
   self.messageSchema = MESSAGE_SCHEMA;
   self.optionsSchema = OPTIONS_SCHEMA;
+  self.client = arDrone.createClient();
   return this;
 }
 util.inherits(Plugin, EventEmitter);
@@ -55,6 +56,7 @@ util.inherits(Plugin, EventEmitter);
 Plugin.prototype.onMessage = function(message){
   debug('onMessage', message);
   var action = message.payload.action;
+
   var func = _.bind(this.client[action], this.client);
 
   if (_.contains(BASIC_ACTIONS, action)){
@@ -79,7 +81,6 @@ Plugin.prototype.onConfig = function(device){
 Plugin.prototype.setOptions = function(options){
   debug('setOptions', options)
   this.options = options;
-  this.client = arDrone.createClient(this.options);
   this.client.on('navdata', function(data){
     debug('navdata', data);
   });

@@ -1,6 +1,6 @@
 {
   "name": "meshblu-drone-army",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Drone Army Arise!",
   "scripts": {
     "start": "node command.js"
