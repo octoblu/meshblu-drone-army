@@ -1,20 +1,36 @@
-sudo: false
 language: node_js
-cache:
-  bundler: true
-  directories:
-    - node_modules
-notifications:
-  flowdock: e7454f5285e7b9ab67009802d5560490
 node_js:
 - '0.10'
+before_install:
+  - npm install npm -g
+before_deploy:
+  - npm install ws browserify coffeeify
+  - mkdir -p deploy/meshblu-drone-army/latest
+  - mkdir -p deploy/meshblu-drone-army/$TRAVIS_TAG
+  - node_modules/.bin/browserify -t coffeeify -s Connector connector.js > deploy/meshblu-drone-army/latest/meshblu-drone-army.js
+  - gzip deploy/meshblu-drone-army/latest/meshblu-drone-army.js
+  - mv deploy/meshblu-drone-army/latest/meshblu-drone-army.js.gz deploy/meshblu-drone-army/latest/meshblu-drone-army.js
+  - cp deploy/meshblu-drone-army/latest/meshblu-drone-army.js deploy/meshblu-drone-army/$TRAVIS_TAG/meshblu-drone-army.js
 deploy:
-  provider: npm
-  skip_cleanup: true
-  clean_up: false
-  email: serveradmin@octoblu.com
-  api_key:
-    secure: Q3OoECwrkNbqX9a+UCevxJgqrFTReUJgiuKNLDNmAH4oJOiAiUR1bu6IaCsQl1WFh5eiRQFFVZEYrznF470x/ZxhWqGbaptOkMHKibt+j6Sp847VkfU7b8kNHRzSX1E5ddaEfi1LdSdJRbyJVZ9UwYzkNXYHrnwOWTwVM4Y6I80=
-  on:
-    tags: true
-    all_branches: true
+  - provider: s3
+    region: us-west-2
+    skip_cleanup: true
+    detect_encoding: true
+    access_key_id: AKIAJH2D5IPIRHYJT5IA
+    secret_access_key:
+      secure: "DJale0+QdKCkbgW+g2lOBQQBYnklTBkNoyqrH4voTpvTVlso/X8iPZi3eDkNE6GjqDqLqLeUrhDcMwxoA+58WiGuWFsdjTWbYEdJSBG2LNlOJ5AAgp+u8gcUsUDqxgcu44NCC3/0Mrf+JGHdH4JF5eZ65THe2x2oFidpc81oG9w="
+    bucket: octoblu-cdn
+    local-dir: deploy
+    upload-dir: js
+    on:
+      tags: true
+      all_branches: true
+  - provider: npm
+    skip_cleanup: true
+    clean_up: false
+    email: serveradmin@octoblu.com
+    api_key:
+      secure: "PJVrI/b6moxRbCO/4NfjNhuH6gXP+pFmkFoBkgZjoPsQqxH/g+Rj8f/KfYJU9LwNzTjSR5PNoFtZgZNnbuEEDPAFdeFcoTUwiG3OzLTZ5xKPfSwc2tTdYFPDpRHuEhT4wlLE1OYu8cgfCYgP5b/1YizP3t2jifXJhcLsFsLVMlM="
+    on:
+      tags: true
+      all_branches: true
